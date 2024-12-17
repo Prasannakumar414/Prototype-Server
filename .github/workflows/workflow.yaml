@@ -3,6 +3,7 @@ on: [push]
 env:
  AWS_REGION: ap-south-1
  ECR_REPOSITORY: 533267288970.dkr.ecr.ap-south-1.amazonaws.com/prototypes/base-server
+ IMAGE_TAG: ${{ github.ref_name }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,8 +26,8 @@ jobs:
         id: build-publish
         shell: bash
         run: |
-            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
+            docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+            docker push $ECR_REPOSITORY:$IMAGE_TAG
+            echo "IMAGE $IMAGE_TAG is pushed to $ECR_REPOSITORY"
             echo "image_tag=$IMAGE_TAG" 
-            echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"  
+            echo "full_image=$ECR_REPOSITORY:$IMAGE_TAG"  
