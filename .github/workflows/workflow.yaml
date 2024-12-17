@@ -1,5 +1,8 @@
 name: Build and Deploy Docker image
-on: [push]  
+on:
+ push:
+  tags:
+   "*"
 env:
  AWS_REGION: ap-south-1
  ECR_REPOSITORY: 533267288970.dkr.ecr.ap-south-1.amazonaws.com/prototypes/base-server
