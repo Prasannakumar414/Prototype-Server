@@ -1,8 +1,5 @@
 name: Build and Deploy Docker image
-on: [push]
-permissions:
-  id-token: write   # This is required for requesting the JWT
-  contents: read  
+on: [push]  
 jobs:
   build:
     runs-on: ubuntu-latest
