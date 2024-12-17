@@ -1,8 +1,5 @@
 name: Build and Deploy Docker image
-on:
-  push:
-    tags:
-      - '*'
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,11 +7,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4 # More information on this action can be found below in the 'AWS Credentials' section
+        with:
+          role-to-assume: arn:aws:iam::533267288970:user/terraform-resource-manager
+          aws-region: ap-south-1
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registries: ${{ inputs.aws_account_id }}
             
       - name: Build, tag, and push image to Amazon ECR
         id: build-publish
