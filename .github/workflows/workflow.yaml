@@ -1,5 +1,8 @@
 name: Build and Deploy Docker image
 on: [push]  
+env:
+ AWS_REGION: ap-south-1
+ ECR_REPOSITORY: 533267288970.dkr.ecr.ap-south-1.amazonaws.com/prototypes/base-server
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -8,25 +11,22 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4 # More information on this action can be found below in the 'AWS Credentials' section
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
         with:
-          role-to-assume: arn:aws:iam::533267288970:user/terraform-resource-manager
-          aws-region: ap-south-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-            
+        uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-publish
         shell: bash
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
-          IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
-            docker build "${{ inputs.docker_build_dir }}" -f "${{ inputs.path_to_dockerfile }}" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-            docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
             echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
             echo "image_tag=$IMAGE_TAG" 
             echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"  
